@@ -220,7 +220,7 @@ int main(){
 }
         \end{lstlisting}
 
-        > gcc vararray.c \&\& echo 3 | ./a.out`
+        > gcc vararray.c \&\& echo 3 | ./a.out
 
         > p:131068 and q:12
     
@@ -244,10 +244,10 @@ int main(){
     \begin{frame}
         \frametitle{结构体的对齐}
     
-        对齐的规则：
+        结构体对齐的规则：
         \begin{itemize}
             \item 结构体内部对齐：每个K字节的基本对象的地址必须是K的倍数
-            \item 结构体整体对其：结构体整体长度是结构体中最大的元素长度的整数倍
+            \item 结构体整体对齐：结构体整体长度是结构体中最大的基本对象长度的整数倍
         \end{itemize}
 
         编译器会用0补足空隙，保证对齐
