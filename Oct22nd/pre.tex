@@ -205,6 +205,27 @@ void ji() {
     
     \end{frame}
 
+    \begin{frame}[fragile]
+        \frametitle{正确理解“变长”}
+    
+        \begin{lstlisting}
+// vararray.c
+# include<stdio.h>
+int main(){
+    int n, p[n];
+    scanf("%d",&n);
+    int q[n];
+    printf("p:%lu and q:%lu",sizeof(p),sizeof(q));
+    return 0;
+}
+        \end{lstlisting}
+
+        > gcc vararray.c \&\& echo 3 | ./a.out`
+
+        > p:131068 and q:12
+    
+    \end{frame}
+
     \section{结构体}
 
     \begin{frame}
