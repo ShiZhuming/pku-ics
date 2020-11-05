@@ -1,7 +1,8 @@
 % Author：Zhuming Shi, Peking University
 % Theme from https://github.com/matze/mtheme
 
-\documentclass[12pt,AutoFakeBold,aspectratio=169,mathserif]{beamer}
+% \documentclass[12pt,AutoFakeBold,aspectratio=169,mathserif]{beamer}
+\documentclass[12pt,AutoFakeBold,aspectratio=43,mathserif]{beamer}
 \usepackage[english]{babel}
 
 \usetheme{metropolis}
@@ -70,7 +71,8 @@
 \begin{document}
     {
     % \setbeamertemplate{background}{\includegraphics[height=\paperheight]{figures/sisters1080.png}}
-    \setbeamertemplate{background}{\includegraphics[height=\paperheight]{figures/misaka1080.jpg}}
+    % \setbeamertemplate{background}{\includegraphics[height=\paperheight]{figures/misaka1080.jpg}}
+    \setbeamertemplate{background}{\includegraphics[height=\paperheight]{figures/misaka43.jpg}}
     
     \begin{frame}
     \titlepage
@@ -169,6 +171,146 @@
     \end{frame}
 
     \section{处理器级优化}
+
+    \begin{frame}
+        \frametitle{超标量处理器}
+
+        \begin{figure}
+            \includegraphics[width=\textwidth]{figures/8.png}
+        \end{figure}
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{发射、延迟与容量}
+    
+        \begin{itemize}
+            \item 执行乱序，提交顺序
+            \item 发射时间：两个连续同类运算之间需要的最小周期
+            \item 延迟：完成运算需要的总时间
+            \item 容量：能执行 该运算的功能单元数量
+            \item 吞吐量：发射时间的倒数
+        \end{itemize}
+
+        \begin{figure}
+            \includegraphics[width=\textwidth]{figures/9.png}
+        \end{figure}
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{发射、延迟与容量}
+
+        \begin{itemize}
+            \item 执行乱序，提交顺序
+            \item 发射时间：两个连续同类运算之间需要的最小周期
+            \item 延迟：完成运算需要的总时间
+            \item 容量：能执行 该运算的功能单元数量
+            \item 吞吐量：发射时间的倒数
+        \end{itemize}
+    
+        \begin{figure}
+            \includegraphics[width=\textwidth]{figures/10.png}
+        \end{figure}
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{循环展开}
+    
+        增大步长，减少循环次数，从而减少循环控制的开销
+
+        \begin{figure}
+            \includegraphics[width=.5\textwidth]{figures/11.png}
+        \end{figure}
+        
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{使用分配律重新结合}
+    
+        “让流水线流动起来”
+        
+        但是有不可交换的风险（比如交错级数求和）
+        \begin{figure}
+            \subfigure[]{
+                \includegraphics[width=.3\textwidth]{figures/14.png}
+            }
+            \subfigure[]{
+                \includegraphics[width=.6\textwidth]{figures/12.png}
+            }
+        \end{figure}
+
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{多个变量累积}
+    
+        “让流水线流动起来”
+        
+        但要付出最后重新结合的代价，切的太多最后代价大
+
+        同样有不可交换的风险（比如交错级数求和）
+        \begin{figure}
+            \subfigure[]{
+                \includegraphics[width=.3\textwidth]{figures/15.png}
+            }
+            \subfigure[]{
+                \includegraphics[width=.6\textwidth]{figures/13.png}
+            }
+        \end{figure}
+        
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{循环展开和变量累积}
+    
+        展开L级，累积K个变量
+
+        风险：
+        \begin{itemize}
+            \item 寄存器溢出：累积变量数量超过可用寄存器数量（通常被吞吐上限制约）
+            \item 有不可交换的风险，如交错级数奇偶项分开求和溢出\[\sum_{i=1}^\infty(-1)^n\frac{1}{n}\]
+            \item 最后处理K个变量开销不可忽略，可能得不偿失
+        \end{itemize}
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{各个方法的比较}
+    
+        \begin{figure}
+            \includegraphics[width=\textwidth]{figures/add.png}
+        \end{figure}
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{各个方法的比较}
+    
+        \begin{figure}
+            \includegraphics[width=\textwidth]{figures/multi.png}
+        \end{figure}
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{各个方法的比较}
+    
+        \begin{figure}
+            \includegraphics[width=\textwidth]{figures/16.png}
+        \end{figure}
+    
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{利用AVS向量计算}
+    
+        \begin{figure}
+            \includegraphics[width=\textwidth]{figures/fpu.png}
+        \end{figure}
+    
+    \end{frame}
     
     \section*{致谢}}
 
