@@ -2,7 +2,7 @@
 % Theme from https://github.com/matze/mtheme
 
 % \documentclass[12pt,AutoFakeBold,aspectratio=169,mathserif]{beamer}
-\documentclass[12pt,AutoFakeBold,aspectratio=43,mathserif]{beamer}
+\documentclass[AutoFakeBold]{beamer}
 \usepackage[english]{babel}
 
 \usetheme{metropolis}
@@ -12,7 +12,7 @@
 \newfontfamily\arial{Arial}% Arial字体
 
 \usepackage{xeCJK} % 中文支持
-\setCJKmainfont{SimSun} % 中文字体
+\setCJKmainfont{SimHei} % 中文字体
 \XeTeXlinebreaklocale "zh"%中文自动换行
 \XeTeXlinebreakskip = 0pt plus 1pt%中文自动换行
 
@@ -124,32 +124,129 @@
                 \item 只写http://pkuszm.cn/则发送默认文件
             \end{itemize}
             \item 动态内容：https://cn.bing.com/search?q=清华大学\begin{itemize}
-                \item 通常长成...?...=...这个样子
+                \item 通常长成...?...这个样子（后面细讲）
             \end{itemize}
+        \end{itemize}
+    
+    \end{frame}
+
+    \begin{frame}[fragile]
+        \frametitle{客户端怎样进行http请求？}
+    
+        \begin{itemize}
+            \item 一个请求行+任意个请求报头+\textbackslash r\textbackslash n
+            \item 请求行<method> <uri> <version> \begin{itemize}
+                \item method: GET, POST等
+                \item uri: 广义的url，类比地址
+                \item version: HTTP/1.0或者HTTP/1.1
+            \end{itemize}
+            \item 请求报头<header name>: <header data>\begin{itemize}
+                \item 额外的信息，例如浏览器叫chrome
+            \end{itemize}
+            \item \textbackslash r\textbackslash n（空行，表示结束）
+        \end{itemize}
+        \begin{lstlisting}
+GET / HTTP/1.1
+Host:pkuszm.cn
+\r\n
+        \end{lstlisting}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{服务器怎样进行http响应？}
+    
+        \begin{itemize}
+            \item 一个响应行+任意个响应报头+\textbackslash r\textbackslash n+\textbf{响应主体}
+            \item 响应行<version> <status code> <status msg> \begin{itemize}
+                \item version: HTTP/1.0或者HTTP/1.1
+                \item status code: 200（OK） 301（Moved）等
+                \item status msg: 英文描述
+            \end{itemize}
+            \item 响应报头<header name>: <header data>\begin{itemize}
+                \item Content-Type和Content-Length比较重要
+            \end{itemize}
+            \item \textbackslash r\textbackslash n（空行，表示结束）
+            \item 响应主体\begin{itemize}
+                \item 分片给出，每片前面有个16进制数表明片的大小（byte为单位，0表示没有）
+            \end{itemize}
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}[fragile]
+        \frametitle{服务器怎样进行http响应？}
+        \begin{lstlisting}
+HTTP/1.1 301 Moved Permanently
+Content-Type: text/html; charset=...
+\r\n
+15c
+<HTML><HEAD>
+…
+</BODY></HTML>
+0
+\r\n
+        \end{lstlisting}
+    \end{frame}
+    
+    \section{TINY服务器的实现}
+    \begin{frame}
+        \frametitle{服务器要做什么？}
+    
+        \begin{itemize}
+            \item 与客户端连接
+            \item 通过socket读请求
+            \item 切割请求行（暂时只支持GET）
+            \item 如果uri包含cgi-bin，说明是动态的，fork一个进程去做
+            \item 否则是静态的，直接把静态文件发过去
         \end{itemize}
     
     \end{frame}
 
     \begin{frame}
-        \frametitle{http请求}
+        \frametitle{如何应对动态请求？}
+
+        \begin{figure}
+            \centering
+            \subfigure[]{\includegraphics[height=.25\paperheight]{figures/1.png}}
+            \subfigure[]{\includegraphics[height=.25\paperheight]{figures/2.png}}
+            \subfigure[]{\includegraphics[height=.25\paperheight]{figures/3.png}}
+        \end{figure}
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{CGI怎么解决问题？}
     
         \begin{itemize}
-            \item 一个请求行+任意个请求报头
-            \item 请求行<method> <uri> <version>\begin{itemize}
-                \item <method> GET, POST, OPTIONS, HEAD, PUT, DELETE, TRACE
-                \item <uri> 广义的url，类比地址
-                \item <version> HTTP/1.0或者HTTP/1.1
+            \item Q：客户端怎么将参数传给服务器？
+            \item A：在URI中传递\begin{itemize}
+                \item \textcolor{gray}{http://add.com/cgi-bin/}\textcolor{blue}{adder}\textcolor{red}{?}\textcolor{dkgreen}{15213}\textcolor{mauve}{\&}\textcolor{dkgreen}{18213}
+                \item 运行程序adder，?后接参数，用\&分隔，空格用+或\%20
             \end{itemize}
-            \item 请求报头<header name>: <header data>\begin{itemize}
-                \item 额外的信息，例如浏览器叫chrome
+            \item Q: 服务器如何把参数传给子进程？
+            \item A: 通过设置环境变量QUERY\_STRING\begin{itemize}
+                \item QUERY\_STRING = “15213\&18213”
+                \item adder可以用函数getenv来引用它
             \end{itemize}
+            \item Q: 服务器如何把其他信息传给子进程？
+            \item A: 通过设置CGI定义的许多环境变量
+            \item Q: 服务器如何获得子进程的输出？
+            \item A: 子进程输出到stdout，经过服务器用dup2重定向到socket
         \end{itemize}
     
     \end{frame}
-    
-    \section{小型服务器的实现}
 
     \section{代理}
+    \begin{frame}
+        \frametitle{什么是代理？}
+    
+        \begin{figure}
+            \centering
+            \includegraphics[width=.618\paperwidth]{figures/4.png}
+
+            \includegraphics[width=.618\paperwidth]{figures/5.png}
+        \end{figure}
+    
+    \end{frame}
     
     \section*{致谢}}
 
@@ -158,7 +255,11 @@
         \frametitle{致谢}
         \begin{columns}
             \begin{column}{.5\linewidth}
-                祝大家圣诞快乐！谢谢聆听！
+                \begin{center}
+                    祝大家圣诞快乐！
+                
+                    谢谢聆听！
+                \end{center}
             \end{column}
             \begin{column}{.5\linewidth}
                 \includegraphics[width=.4\paperwidth]{figures/misaka558.png}
