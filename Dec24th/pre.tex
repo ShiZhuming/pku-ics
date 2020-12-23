@@ -85,7 +85,7 @@
     
         \begin{itemize}
             \item 超文本传输协议\begin{itemize}
-                \item 超在哪里？可以包含超链接
+                \item 超在哪里？可以包含超链接<a herf="..."> </a>
             \end{itemize}
             \item 四步走\begin{itemize}
                 \item 建立TCP连接
@@ -125,6 +125,23 @@
             \end{itemize}
             \item 动态内容：https://cn.bing.com/search?q=清华大学\begin{itemize}
                 \item 通常长成...?...=...这个样子
+            \end{itemize}
+        \end{itemize}
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{http请求}
+    
+        \begin{itemize}
+            \item 一个请求行+任意个请求报头
+            \item 请求行<method> <uri> <version>\begin{itemize}
+                \item <method> GET, POST, OPTIONS, HEAD, PUT, DELETE, TRACE
+                \item <uri> 广义的url，类比地址
+                \item <version> HTTP/1.0或者HTTP/1.1
+            \end{itemize}
+            \item 请求报头<header name>: <header data>\begin{itemize}
+                \item 额外的信息，例如浏览器叫chrome
             \end{itemize}
         \end{itemize}
     
